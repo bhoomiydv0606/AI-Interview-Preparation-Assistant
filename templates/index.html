@@ -142,10 +142,23 @@
     <div class="panel">
       <div class="section-label"><i class="ti ti-adjustments"></i> Difficulty</div>
       <div class="diff-row">
-        <div class="diff-btn active-easy" onclick="setDiff('easy',this)">Easy</div>
-        <div class="diff-btn" onclick="setDiff('medium',this)">Medium</div>
-        <div class="diff-btn" onclick="setDiff('hard',this)">Hard</div>
-      </div>
+  <form method="POST" style="display:contents">
+    <input type="hidden" name="category" value="{{ selected_category }}"/>
+    <input type="hidden" name="answer" value=""/>
+    <button type="submit" name="difficulty" value="Easy"
+      class="diff-btn {% if selected_difficulty == 'Easy' %}active-easy{% endif %}">
+      Easy
+    </button>
+    <button type="submit" name="difficulty" value="Medium"
+      class="diff-btn {% if selected_difficulty == 'Medium' %}active-med{% endif %}">
+      Medium
+    </button>
+    <button type="submit" name="difficulty" value="Hard"
+      class="diff-btn {% if selected_difficulty == 'Hard' %}active-hard{% endif %}">
+      Hard
+    </button>
+  </form>
+</div>
       <div class="section-label" style="margin-top:14px"><i class="ti ti-chart-bar"></i> Session</div>
       <div style="display:flex;flex-direction:column;gap:12px">
         <div>
@@ -162,6 +175,7 @@
 
   <form method="POST" id="mainForm">
     <input type="hidden" name="category" value="{{ selected_category }}"/>
+    <input type="hidden" name="difficulty" value="{{ selected_difficulty }}"/>
     <div class="answer-panel">
       <div class="answer-top">
         <div class="selected-q" id="selectedQ">{{ questions[0] }}</div>
