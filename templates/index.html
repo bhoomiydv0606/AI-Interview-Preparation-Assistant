@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Interview Preparation Assistant</title>
+</head>
+<body>
+
+    <h1>AI Interview Preparation Assistant</h1>
+
+    <h2>Interview Questions</h2>
+
+    <ul>
+        {% for question in questions %}
+            <li>{{ question }}</li>
+        {% endfor %}
+    </ul>
+
+    <form method="POST">
+        <textarea name="answer" rows="6" cols="50"
+        placeholder="Write your answer here"></textarea>
+
+        <br><br>
+
+        <button type="submit">Get Feedback</button>
+    </form>
+
+    <h3>{{ feedback }}</h3>
+
+</body>
+</html>
