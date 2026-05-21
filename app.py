@@ -1,4 +1,5 @@
 
+
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -25,3 +26,15 @@ def home():
 
 if __name__ == "__main__":
     app.run(debug=True)
+=======
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "AI Interview Preparation Assistant"
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
