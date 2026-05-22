@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | AI Interview Preparation Assistant{% endblock %}
+
+{% block content %}
+<section class="page-shell">
+  <div class="page-title">
+    <p class="eyebrow">Progress dashboard</p>
+    <h1>Your interview practice history</h1>
+    <p>Review your recent attempts and focus on the categories that need more practice.</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span>{{ stats.total_attempts }}</span>
+      <small>Total attempts</small>
+    </div>
+    <div class="stat-card">
+      <span>{{ stats.average_score }}</span>
+      <small>Average score</small>
+    </div>
+    <div class="stat-card">
+      <span>{{ stats.best_score }}</span>
+      <small>Best score</small>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <section class="dashboard-panel">
+      <div class="panel-heading">
+        <span>Recent attempts</span>
+        <small>{{ attempts|length }} shown</small>
+      </div>
+      {% if attempts %}
+        <div class="attempt-list">
+          {% for attempt in attempts %}
+            <article class="attempt-item">
+              <div>
+                <strong>{{ attempt.question }}</strong>
+                <small>{{ attempt.category }} / {{ attempt.difficulty }} / {{ attempt.created_at }}</small>
+              </div>
+              <span class="attempt-score">{{ attempt.score }}</span>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <h2>No attempts yet</h2>
+          <p>Start a practice session and your results will appear here.</p>
+          <a class="primary-button button-link" href="{{ url_for('main.index') }}">Start practicing</a>
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="dashboard-panel">
+      <div class="panel-heading">
+        <span>Category performance</span>
+        <small>Average score</small>
+      </div>
+      {% if stats.categories %}
+        <div class="category-breakdown">
+          {% for category in stats.categories %}
+            <div class="category-row">
+              <div>
+                <strong>{{ category.category }}</strong>
+                <small>{{ category.attempts }} attempts</small>
+              </div>
+              <div class="mini-meter">
+                <span style="width: {{ category.average_score }}%"></span>
+              </div>
+              <strong>{{ category.average_score }}</strong>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state compact">
+          <h2>No category data</h2>
+          <p>Practice across categories to build a useful profile.</p>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,162 @@
+{
+  "HR / Behavioral": {
+    "Easy": [
+      "Tell me about yourself.",
+      "Why do you want this job?",
+      "What are your strengths?",
+      "What are your hobbies?"
+    ],
+    "Medium": [
+      "Describe a time you received feedback and improved.",
+      "What is your biggest weakness and how are you working on it?",
+      "How do you handle stress during deadlines?",
+      "Where do you see yourself in five years?"
+    ],
+    "Hard": [
+      "Tell me about a conflict you had with a colleague and how you resolved it.",
+      "Describe a time you failed and what you learned from it.",
+      "Give an example of a time you showed ownership under pressure.",
+      "Tell me about a time you had to adapt quickly to change."
+    ]
+  },
+  "Technical / Coding": {
+    "Easy": [
+      "What is the difference between frontend and backend?",
+      "What is an API?",
+      "What is version control?",
+      "What is the difference between a list and a tuple in Python?"
+    ],
+    "Medium": [
+      "Explain object-oriented programming with an example.",
+      "What is the difference between SQL and NoSQL?",
+      "What is recursion? Give a real-world example.",
+      "Explain what a REST API is."
+    ],
+    "Hard": [
+      "How would you optimize a slow database query?",
+      "Explain the difference between concurrency and parallelism.",
+      "How does a hash map work internally?",
+      "How would you debug a production issue with limited logs?"
+    ]
+  },
+  "Leadership": {
+    "Easy": [
+      "Have you ever led a group project?",
+      "How do you organize your own work?",
+      "What does good teamwork mean to you?",
+      "How do you support a team member who is stuck?"
+    ],
+    "Medium": [
+      "Describe a time you motivated a team member.",
+      "How do you handle conflict within a team?",
+      "How do you prioritize tasks for your team?",
+      "What is your leadership style?"
+    ],
+    "Hard": [
+      "Describe a time you had to make a tough decision that affected your whole team.",
+      "Tell me about a time you led a failing project back to success.",
+      "How would you handle a senior team member who refuses to follow your direction?",
+      "How do you balance speed and quality as a leader?"
+    ]
+  },
+  "Situational": {
+    "Easy": [
+      "What would you do if you did not understand a task given to you?",
+      "How would you ask for help if you were stuck?",
+      "What would you do if you were going to miss a deadline?",
+      "How would you respond if your teammate made a small mistake?"
+    ],
+    "Medium": [
+      "What would you do if you disagreed with your manager's decision?",
+      "How would you handle working with someone you dislike?",
+      "What would you do if two urgent tasks arrived at the same time?",
+      "How would you handle an unhappy customer?"
+    ],
+    "Hard": [
+      "What would you do if you discovered a colleague was acting unethically?",
+      "How would you handle a situation where your team is demotivated and behind schedule?",
+      "What would you do if you were asked to do something that goes against company policy?",
+      "How would you handle an unclear requirement from an important client?"
+    ]
+  },
+  "Aptitude": {
+    "Easy": [
+      "What comes next in the series: 2, 4, 8, 16, ?",
+      "Find the odd one out: Apple, Mango, Carrot, Banana.",
+      "If A is taller than B and B is taller than C, who is the shortest?",
+      "If 5 pens cost 50, what is the cost of 8 pens?"
+    ],
+    "Medium": [
+      "A train travels 60 km per hour for 2.5 hours. How far does it travel?",
+      "A product costs 80 after a 20 percent discount. What was the original price?",
+      "What is 15 percent of 240?",
+      "If 8 workers finish a job in 6 days, how many days for 12 workers?"
+    ],
+    "Hard": [
+      "A clock shows 3:15. What is the angle between the hour and minute hands?",
+      "A car depreciates 10 percent per year. What is its value after 2 years if it originally costs 10000?",
+      "Complete the analogy: Book is to Reading as Fork is to ?",
+      "Two numbers have a sum of 30 and a product of 216. What are the numbers?"
+    ]
+  },
+  "Data Structures": {
+    "Easy": [
+      "What is an array?",
+      "What is a stack?",
+      "What is a queue?",
+      "What is time complexity?"
+    ],
+    "Medium": [
+      "Explain the difference between a stack and a queue.",
+      "When would you use a linked list instead of an array?",
+      "What is a binary search tree?",
+      "Explain breadth-first search in simple words."
+    ],
+    "Hard": [
+      "How would you detect a cycle in a linked list?",
+      "Compare BFS and DFS for graph traversal.",
+      "How does a heap support priority queue operations?",
+      "How would you choose the right data structure for a search-heavy feature?"
+    ]
+  },
+  "System Design": {
+    "Easy": [
+      "What is scalability?",
+      "What is caching?",
+      "What is a load balancer?",
+      "What is the difference between vertical and horizontal scaling?"
+    ],
+    "Medium": [
+      "Design a URL shortener at a high level.",
+      "How would you design a simple chat application?",
+      "How would you store user uploaded files?",
+      "How would you improve the performance of a slow web app?"
+    ],
+    "Hard": [
+      "Design a notification system for millions of users.",
+      "How would you design a rate limiter?",
+      "How would you make a system highly available?",
+      "How would you design an interview practice platform like this one?"
+    ]
+  },
+  "Communication": {
+    "Easy": [
+      "How do you explain a technical topic to a non-technical person?",
+      "How do you ask clarifying questions?",
+      "How do you give constructive feedback?",
+      "How do you prepare for a presentation?"
+    ],
+    "Medium": [
+      "Describe a time you handled a misunderstanding.",
+      "How do you communicate delays to stakeholders?",
+      "How do you keep your team updated during a project?",
+      "How would you explain a complex bug to your manager?"
+    ],
+    "Hard": [
+      "Tell me about a time your communication changed the outcome of a project.",
+      "How would you handle a stakeholder who keeps changing requirements?",
+      "How do you communicate bad news professionally?",
+      "How would you align two teams with conflicting priorities?"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}{{ status_code }} | AI Interview Preparation Assistant{% endblock %}
+
+{% block content %}
+<section class="page-shell narrow">
+  <div class="empty-state">
+    <p class="eyebrow">Error {{ status_code }}</p>
+    <h1>{{ message }}</h1>
+    <p>Return to the practice page and continue preparing.</p>
+    <a class="primary-button button-link" href="{{ url_for('main.index') }}">Go to practice</a>
+  </div>
+</section>
+{% endblock %}

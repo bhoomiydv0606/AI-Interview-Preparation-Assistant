@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Practice | AI Interview Preparation Assistant{% endblock %}
+
+{% block content %}
+<section
+  class="practice-shell"
+  data-practice-app
+  data-category="{{ selected_category }}"
+  data-difficulty="{{ selected_difficulty }}"
+  data-first-question="{{ questions[0] }}"
+>
+  <section class="hero-band">
+    <div>
+      <p class="eyebrow">Placement-ready practice</p>
+      <h1>Practice interviews with instant AI feedback.</h1>
+      <p class="hero-copy">
+        Choose a category, answer real interview questions, and get a score with practical tips
+        based on relevance, STAR structure, detail, and communication.
+      </p>
+    </div>
+    <div class="hero-metrics" aria-label="Your progress summary">
+      <div>
+        <span id="totalAttempts">{{ stats.total_attempts }}</span>
+        <small>Attempts</small>
+      </div>
+      <div>
+        <span id="averageScore">{{ stats.average_score }}</span>
+        <small>Avg score</small>
+      </div>
+      <div>
+        <span id="bestScore">{{ stats.best_score }}</span>
+        <small>Best</small>
+      </div>
+    </div>
+  </section>
+
+  <div class="workspace-grid">
+    <aside class="control-panel" aria-label="Question filters">
+      <div class="panel-heading">
+        <span>Question bank</span>
+        <small>{{ categories|length }} categories</small>
+      </div>
+
+      <div class="field-group">
+        <label>Category</label>
+        <div class="chip-grid" id="categoryButtons">
+          {% for category in categories %}
+            <button
+              type="button"
+              class="chip {% if category == selected_category %}is-active{% endif %}"
+              data-category="{{ category }}"
+            >{{ category }}</button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Difficulty</label>
+        <div class="segmented" id="difficultyButtons">
+          {% for difficulty in difficulties %}
+            <button
+              type="button"
+              class="segment {% if difficulty == selected_difficulty %}is-active{% endif %}"
+              data-difficulty="{{ difficulty }}"
+            >{{ difficulty }}</button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="question-list" id="questionList" aria-label="Questions">
+        {% for question in questions %}
+          <button
+            type="button"
+            class="question-card {% if loop.first %}is-active{% endif %}"
+            data-question="{{ question }}"
+          >
+            <span class="question-number">{{ loop.index }}</span>
+            <span>{{ question }}</span>
+          </button>
+        {% endfor %}
+      </div>
+    </aside>
+
+    <section class="answer-panel">
+      <div class="panel-heading">
+        <span>Answer workspace</span>
+        <small id="selectedMeta">{{ selected_category }} / {{ selected_difficulty }}</small>
+      </div>
+
+      <div class="selected-question">
+        <span>Selected question</span>
+        <strong id="selectedQuestion">{{ questions[0] }}</strong>
+      </div>
+
+      <form id="feedbackForm" class="feedback-form">
+        <label for="answerInput">Your answer</label>
+        <textarea
+          id="answerInput"
+          name="answer"
+          maxlength="4000"
+          placeholder="Write your answer here. Include the situation, your action, and the result."
+          required
+        ></textarea>
+
+        <div class="live-meter" aria-label="Answer readiness">
+          <div>
+            <span>Readiness</span>
+            <strong id="readinessLabel">0%</strong>
+          </div>
+          <div class="meter-track">
+            <span class="meter-fill" id="readinessBar"></span>
+          </div>
+          <small id="wordCount">0 words</small>
+        </div>
+
+        <div class="form-actions">
+          <button class="primary-button" id="submitButton" type="submit">Analyze answer</button>
+          <button class="secondary-button" id="clearButton" type="button">Clear</button>
+        </div>
+      </form>
+
+      <section class="feedback-panel is-hidden" id="feedbackPanel" aria-live="polite">
+        <div class="feedback-header">
+          <div>
+            <span>AI feedback</span>
+            <strong id="feedbackGrade">-</strong>
+          </div>
+          <div class="score-pill"><span id="feedbackScore">0</span>/100</div>
+        </div>
+
+        <p id="feedbackSummary" class="feedback-summary"></p>
+
+        <div class="criteria-grid" id="criteriaGrid"></div>
+
+        <div class="feedback-lists">
+          <div>
+            <h3>Strengths</h3>
+            <ul id="strengthList"></ul>
+          </div>
+          <div>
+            <h3>Improve next</h3>
+            <ul id="improvementList"></ul>
+          </div>
+        </div>
+      </section>
+    </section>
+  </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
