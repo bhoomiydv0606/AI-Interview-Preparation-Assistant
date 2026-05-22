@@ -16,8 +16,6 @@ services:
         fromDatabase:
           name: ai-interview-preparation-db
           property: connectionString
-      - key: KEEP_ALIVE_ENABLED
-        value: "false"
 
 databases:
   - name: ai-interview-preparation-db

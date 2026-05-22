@@ -183,8 +183,8 @@ The app will create the SQLite database automatically inside the `instance/` fol
 | `GEMINI_API_KEY` | Gemini API key from Google AI Studio |
 | `GEMINI_MODEL` | Gemini model name. Default: `gemini-3.5-flash` |
 | `GEMINI_TIMEOUT_SECONDS` | Gemini request timeout. Default: `20` |
-| `KEEP_ALIVE_ENABLED` | Set to `true` to enable the optional keep-alive pinger |
-| `KEEP_ALIVE_URL` | Your deployed Render health URL, for example `https://your-app.onrender.com/healthz` |
+| `KEEP_ALIVE_ENABLED` | Optional override. On Render, keep-alive is enabled by default. Set `false` to disable |
+| `KEEP_ALIVE_URL` | Optional override. On Render, this is auto-built from `RENDER_EXTERNAL_HOSTNAME` |
 | `KEEP_ALIVE_INTERVAL_SECONDS` | Ping interval. Default is `600` seconds |
 
 ## Render Deployment
@@ -248,20 +248,24 @@ Do not put your Gemini API key in GitHub or in frontend JavaScript. The key is r
 
 Render free web services can sleep after inactivity. This app includes an optional pinger that calls your own health endpoint while the app is already running.
 
-After your Render app is deployed, add these environment variables:
+On Render, the internal keep-alive pinger is enabled by default and uses Render's built-in `RENDER_EXTERNAL_HOSTNAME` value to call:
 
 ```text
-KEEP_ALIVE_ENABLED=true
-KEEP_ALIVE_URL=https://your-app-name.onrender.com/healthz
+https://your-render-hostname/healthz
+```
+
+You only need to set variables if you want to override the default:
+
+```text
+KEEP_ALIVE_ENABLED=false
+KEEP_ALIVE_URL=https://custom-domain.com/healthz
 KEEP_ALIVE_INTERVAL_SECONDS=600
 ```
 
-Then redeploy the service.
-
 Important notes:
 
-- Replace `your-app-name` with your real Render app URL.
 - The pinger cannot wake the app if it is already asleep; the first visitor may still see one cold start.
+- External uptime monitors are still more reliable than an internal ping.
 - Render free services are still not guaranteed to be always-on. For production, use a paid instance.
 
 ## Run Tests

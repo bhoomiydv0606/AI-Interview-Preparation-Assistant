@@ -19,6 +19,18 @@ def _int_env(name, default):
         return default
 
 
+def _render_health_url():
+    explicit_url = os.environ.get("KEEP_ALIVE_URL", "").strip()
+    if explicit_url:
+        return explicit_url
+
+    external_hostname = os.environ.get("RENDER_EXTERNAL_HOSTNAME", "").strip()
+    if external_hostname:
+        return f"https://{external_hostname}/healthz"
+
+    return ""
+
+
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-before-deploy")
     DEBUG = os.environ.get("FLASK_DEBUG", "0") == "1"
@@ -34,6 +46,6 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
     SESSION_COOKIE_SECURE = os.environ.get("FLASK_ENV") == "production"
-    KEEP_ALIVE_ENABLED = _bool_env("KEEP_ALIVE_ENABLED", False)
-    KEEP_ALIVE_URL = os.environ.get("KEEP_ALIVE_URL", "").strip()
+    KEEP_ALIVE_ENABLED = _bool_env("KEEP_ALIVE_ENABLED", os.environ.get("RENDER") == "true")
+    KEEP_ALIVE_URL = _render_health_url()
     KEEP_ALIVE_INTERVAL_SECONDS = max(300, _int_env("KEEP_ALIVE_INTERVAL_SECONDS", 600))
