@@ -81,3 +81,14 @@ def create_app(test_config=None):
     start_keep_alive(app)
 
     return app
+
+
+_wsgi_app = None
+
+
+def app(environ, start_response):
+    """Compatibility entry point for hosts still running `gunicorn app:app`."""
+    global _wsgi_app
+    if _wsgi_app is None:
+        _wsgi_app = create_app()
+    return _wsgi_app(environ, start_response)
