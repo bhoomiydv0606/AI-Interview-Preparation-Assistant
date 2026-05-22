@@ -1,6 +1,6 @@
 # AI Interview Preparation Assistant
 
-A professional Flask web application for placement interview practice. Users can register, log in, answer categorized interview questions, receive AI-style feedback, and track scores in a SQLite database.
+A professional Flask web application for placement interview practice. Users can register, log in, answer categorized interview questions, receive Gemini AI feedback with a local fallback, and track scores in a database.
 
 ## Features
 
@@ -8,7 +8,8 @@ A professional Flask web application for placement interview practice. Users can
 - User registration, login, logout, and protected pages
 - SQLite database locally and Render Postgres in production
 - Question categories with Easy, Medium, and Hard levels
-- Local AI-style feedback engine using NLP-inspired scoring
+- Gemini AI feedback when `GEMINI_API_KEY` is configured
+- Local AI-style feedback fallback when Gemini is unavailable
 - Score, grade, strengths, improvement tips, and criteria breakdown
 - Dashboard with attempt history and category performance
 - Responsive HTML, CSS, and JavaScript frontend
@@ -109,7 +110,7 @@ Provides JSON endpoints for loading questions, generating feedback, and fetching
 Loads questions from JSON and validates category/difficulty values.
 
 `app/services/feedback.py`  
-Local AI-style feedback engine. It scores answers using relevance, STAR structure, specificity, and communication quality.
+Gemini feedback integration. If `GEMINI_API_KEY` is present, it sends the question and answer to Gemini and expects structured JSON feedback. If Gemini is unavailable, it falls back to local scoring based on relevance, STAR structure, specificity, and communication quality.
 
 `app/services/keep_alive.py`  
 Optional background pinger for Render free-tier demos. Enable it with environment variables only after deployment.
@@ -179,6 +180,9 @@ The app will create the SQLite database automatically inside the `instance/` fol
 | `FLASK_DEBUG` | Use `1` for local debug mode only |
 | `DATABASE_PATH` | Optional custom SQLite file path for local development |
 | `DATABASE_URL` | Render Postgres connection string. If present, the app uses Postgres instead of SQLite |
+| `GEMINI_API_KEY` | Gemini API key from Google AI Studio |
+| `GEMINI_MODEL` | Gemini model name. Default: `gemini-3.5-flash` |
+| `GEMINI_TIMEOUT_SECONDS` | Gemini request timeout. Default: `20` |
 | `KEEP_ALIVE_ENABLED` | Set to `true` to enable the optional keep-alive pinger |
 | `KEEP_ALIVE_URL` | Your deployed Render health URL, for example `https://your-app.onrender.com/healthz` |
 | `KEEP_ALIVE_INTERVAL_SECONDS` | Ping interval. Default is `600` seconds |
@@ -193,6 +197,7 @@ The app will create the SQLite database automatically inside the `instance/` fol
 4. Add environment variables:
    - `SECRET_KEY`: generate a strong random value
    - `FLASK_ENV`: `production`
+   - `GEMINI_API_KEY`: your Gemini API key from Google AI Studio
 5. Create a Render Postgres database and add its **Internal Database URL** as `DATABASE_URL`.
 
 The included `render.yaml` can also be used as a blueprint.
@@ -221,6 +226,23 @@ DATABASE_URL=postgresql://user:password@host:port/database
 5. Redeploy the web service.
 
 When `DATABASE_URL` exists, the app automatically stores users and attempts in Postgres.
+
+### Gemini API Setup
+
+1. Create a Gemini API key in Google AI Studio.
+2. In Render, open your web service.
+3. Go to **Environment**.
+4. Add:
+
+```text
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_MODEL=gemini-3.5-flash
+GEMINI_TIMEOUT_SECONDS=20
+```
+
+5. Redeploy the service.
+
+Do not put your Gemini API key in GitHub or in frontend JavaScript. The key is read only by the Flask backend.
 
 ## Optional Render Keep-Alive
 
@@ -258,4 +280,4 @@ python -m unittest
 
 ## Notes
 
-The feedback engine is local and deterministic, so it works without an external API key. It is designed for placement projects where reliability, privacy, and easy deployment matter.
+Gemini is used only when `GEMINI_API_KEY` is configured. Without that key, the app still works using the local deterministic feedback engine.

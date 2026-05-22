@@ -87,6 +87,7 @@ class InterviewAssistantTestCase(unittest.TestCase):
         data = response.get_json()
         self.assertIn("feedback", data)
         self.assertGreater(data["feedback"]["score"], 40)
+        self.assertEqual(data["feedback"]["provider"], "local")
         self.assertEqual(data["stats"]["total_attempts"], 1)
 
     def test_feedback_rejects_invalid_category(self):

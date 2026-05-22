@@ -23,6 +23,9 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-before-deploy")
     DEBUG = os.environ.get("FLASK_DEBUG", "0") == "1"
     DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+    GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash").strip()
+    GEMINI_TIMEOUT_SECONDS = max(5, _int_env("GEMINI_TIMEOUT_SECONDS", 20))
     DATABASE = os.environ.get(
         "DATABASE_PATH",
         str(BASE_DIR / "instance" / "interview_assistant.sqlite3"),

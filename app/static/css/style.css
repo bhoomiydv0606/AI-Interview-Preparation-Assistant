@@ -533,7 +533,8 @@ label,
 }
 
 .feedback-header span,
-.feedback-header strong {
+.feedback-header strong,
+.feedback-header small {
   display: block;
 }
 
@@ -547,6 +548,13 @@ label,
 .feedback-header strong {
   font-size: 34px;
   line-height: 1;
+}
+
+.feedback-header small {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 4px;
 }
 
 .score-pill {

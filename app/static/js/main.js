@@ -171,6 +171,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("feedbackGrade").textContent = feedback.grade;
     document.getElementById("feedbackScore").textContent = feedback.score;
     document.getElementById("feedbackSummary").textContent = feedback.summary;
+    const provider = feedback.provider === "gemini" ? `Gemini / ${feedback.model}` : "Local fallback";
+    document.getElementById("feedbackProvider").textContent = `Provider: ${provider}`;
 
     const criteriaGrid = document.getElementById("criteriaGrid");
     criteriaGrid.replaceChildren();

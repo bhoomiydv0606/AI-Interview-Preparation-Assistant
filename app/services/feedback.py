@@ -1,5 +1,10 @@
+import json
 import re
+import urllib.error
+import urllib.request
 from collections import Counter
+
+from flask import current_app, has_app_context
 
 
 STOP_WORDS = {
@@ -38,6 +43,29 @@ CATEGORY_KEYWORDS = {
 
 
 def analyze_answer(question, answer, category, difficulty):
+    local_result = _local_analyze_answer(question, answer, category, difficulty)
+    api_key = _config_value("GEMINI_API_KEY", "")
+
+    if not api_key:
+        return local_result
+
+    try:
+        return _gemini_analyze_answer(
+            question=question,
+            answer=answer,
+            category=category,
+            difficulty=difficulty,
+            local_result=local_result,
+            api_key=api_key,
+        )
+    except Exception as error:
+        if has_app_context():
+            current_app.logger.warning("Gemini feedback failed; using local fallback: %s", error)
+        local_result["fallback_reason"] = "Gemini feedback was unavailable, so local feedback was used."
+        return local_result
+
+
+def _local_analyze_answer(question, answer, category, difficulty):
     cleaned_answer = " ".join(answer.strip().split())
     tokens = _tokens(cleaned_answer)
     word_count = len(tokens)
@@ -75,8 +103,174 @@ def analyze_answer(question, answer, category, difficulty):
         "strengths": _strengths(criteria),
         "improvements": _improvements(criteria, difficulty),
         "criteria": criteria,
+        "provider": "local",
     }
     return result
+
+
+def _gemini_analyze_answer(question, answer, category, difficulty, local_result, api_key):
+    model = _config_value("GEMINI_MODEL", "gemini-3.5-flash")
+    timeout = int(_config_value("GEMINI_TIMEOUT_SECONDS", 20))
+    prompt = _build_gemini_prompt(question, answer, category, difficulty)
+    payload = {
+        "contents": [
+            {
+                "role": "user",
+                "parts": [{"text": prompt}],
+            }
+        ],
+        "generationConfig": {
+            "temperature": 0.2,
+            "responseMimeType": "application/json",
+        },
+    }
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+    request = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Content-Type": "application/json",
+            "x-goog-api-key": api_key,
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            response_body = response.read().decode("utf-8")
+    except urllib.error.HTTPError as error:
+        detail = error.read().decode("utf-8", errors="replace")[:300]
+        raise RuntimeError(f"Gemini API returned HTTP {error.code}: {detail}") from error
+
+    response_text = _extract_gemini_text(response_body)
+    gemini_payload = _parse_json_payload(response_text)
+    return _normalize_gemini_result(gemini_payload, local_result, model)
+
+
+def _build_gemini_prompt(question, answer, category, difficulty):
+    return f"""
+You are an expert placement interview coach.
+Evaluate the candidate answer fairly and return only valid JSON. Do not include markdown.
+
+Return this exact JSON shape:
+{{
+  "score": 0,
+  "summary": "one concise paragraph",
+  "strengths": ["specific strength 1", "specific strength 2"],
+  "improvements": ["specific improvement 1", "specific improvement 2"],
+  "criteria": {{
+    "relevance": 0,
+    "structure": 0,
+    "specificity": 0,
+    "communication": 0
+  }}
+}}
+
+Scoring rules:
+- score, relevance, structure, specificity, and communication must be integers from 0 to 100.
+- relevance means the answer directly addresses the question.
+- structure means the answer follows a clear STAR-style flow.
+- specificity means the answer includes concrete actions, examples, metrics, tools, or results.
+- communication means clarity, professional tone, and appropriate length.
+- strengths and improvements must each contain 2 or 3 short practical items.
+
+Category: {category}
+Difficulty: {difficulty}
+Question: {question}
+Candidate answer: {answer}
+""".strip()
+
+
+def _extract_gemini_text(response_body):
+    data = json.loads(response_body)
+    candidates = data.get("candidates") or []
+    if not candidates:
+        raise RuntimeError("Gemini returned no candidates.")
+
+    parts = candidates[0].get("content", {}).get("parts", [])
+    text_parts = [part.get("text", "") for part in parts if part.get("text")]
+    text = "\n".join(text_parts).strip()
+    if not text:
+        raise RuntimeError("Gemini returned an empty response.")
+    return text
+
+
+def _parse_json_payload(text):
+    cleaned = text.strip()
+    cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s*```$", "", cleaned)
+
+    if not cleaned.startswith("{"):
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
+        if start == -1 or end == -1 or end <= start:
+            raise RuntimeError("Gemini response was not valid JSON.")
+        cleaned = cleaned[start : end + 1]
+
+    return json.loads(cleaned)
+
+
+def _normalize_gemini_result(payload, local_result, model):
+    if not isinstance(payload, dict):
+        raise RuntimeError("Gemini response JSON must be an object.")
+
+    score = _bounded_int(payload.get("score"), local_result["score"])
+    criteria = dict(local_result["criteria"])
+    gemini_criteria = payload.get("criteria") if isinstance(payload.get("criteria"), dict) else {}
+    for key in ("relevance", "structure", "specificity", "communication"):
+        criteria[key] = _bounded_int(gemini_criteria.get(key), criteria[key])
+
+    result = dict(local_result)
+    result.update(
+        {
+            "score": score,
+            "grade": _grade(score),
+            "summary": _clean_text(payload.get("summary"), local_result["summary"], 600),
+            "strengths": _clean_list(payload.get("strengths"), local_result["strengths"]),
+            "improvements": _clean_list(payload.get("improvements"), local_result["improvements"]),
+            "criteria": criteria,
+            "provider": "gemini",
+            "model": model,
+        }
+    )
+    return result
+
+
+def _bounded_int(value, fallback):
+    try:
+        number = int(round(float(value)))
+    except (TypeError, ValueError):
+        number = int(fallback)
+    return max(0, min(100, number))
+
+
+def _clean_text(value, fallback, limit):
+    if not isinstance(value, str):
+        return fallback
+    cleaned = " ".join(value.strip().split())
+    if not cleaned:
+        return fallback
+    return cleaned[:limit]
+
+
+def _clean_list(value, fallback):
+    if not isinstance(value, list):
+        return fallback
+
+    items = []
+    for item in value:
+        cleaned = _clean_text(item, "", 180)
+        if cleaned:
+            items.append(cleaned)
+        if len(items) == 3:
+            break
+    return items or fallback
+
+
+def _config_value(name, default):
+    if has_app_context():
+        return current_app.config.get(name, default)
+    return default
 
 
 def _tokens(text):
